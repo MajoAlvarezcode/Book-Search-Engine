@@ -3,19 +3,19 @@ import bcrypt from 'bcrypt';
 
 // import schema from Book.js
 import bookSchema from './Book.js';
-import type { BookDocument } from './Book.js';
+import type { IBook } from './Book.js';
 
-export interface UserDocument extends Document {
+export interface IUser extends Document {
   id: string;
   username: string;
   email: string;
   password: string;
-  savedBooks: BookDocument[];
+  savedBooks: IBook[];
   isCorrectPassword(password: string): Promise<boolean>;
   bookCount: number;
 }
 
-const userSchema = new Schema<UserDocument>(
+const userSchema = new Schema<IUser>(
   {
     username: {
       type: String,
@@ -63,6 +63,6 @@ userSchema.virtual('bookCount').get(function () {
   return this.savedBooks.length;
 });
 
-const User = model<UserDocument>('User', userSchema);
+const User = model<IUser>('User', userSchema);
 
 export default User;
