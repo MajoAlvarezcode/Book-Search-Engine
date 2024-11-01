@@ -6,7 +6,7 @@ import bookSchema from './Book.js';
 import type { IBook } from './Book.js';
 
 export interface IUser extends Document {
-  id: string;
+  _id: string;
   username: string;
   email: string;
   password: string;

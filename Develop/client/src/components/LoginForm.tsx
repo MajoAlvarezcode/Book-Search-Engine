@@ -16,6 +16,9 @@ const LoginForm = ({ handleModalClose }: { handleModalClose: () => void }) => {
     onCompleted(data) {
       const { token } = data.login;
       Auth.login(token); // Store token and redirect
+
+      console.log("Token after login:", token);
+      console.log("Token in localStorage:", localStorage.getItem('id_token'));
       handleModalClose(); // Close the modal
     },
     onError() {

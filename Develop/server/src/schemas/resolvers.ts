@@ -1,8 +1,9 @@
 import { IResolvers } from '@graphql-tools/utils';
-import User, { IUser } from '../models/User';  // Importando el modelo User
+import User, { IUser } from '../models/User.js';  // Importando el modelo User
 import {IBook} from '../models/Book';
-import { authenticateToken } from '../services/auth'; // Asegúrate de tener esta función
-import { AuthenticationError } from '../services/auth';
+// import { authenticateToken } from '../services/auth.js';
+import { AuthenticationError } from '../services/auth.js';
+import { signToken } from '../services/auth.js';
 
 const resolvers: IResolvers = {
     Query: {
@@ -17,36 +18,57 @@ const resolvers: IResolvers = {
             _: any,
             { username, email, password }: { username: string; email: string; password: string }
         ): Promise<{ token: string; user: IUser }> => {
-            const newUser = await User.create({ username, email, password });
-            const token = authenticateToken(newUser);
-            return { token, user: newUser };
+            try {
+                const newUser = await User.create({ username, email, password }) as IUser;
+                const token = signToken(newUser.username, newUser.email, newUser._id);
+                return { token, user: newUser };
+            } catch (error) {
+                console.error("Error creating user:", error);
+                throw new Error("User creation failed");
+            }
         },
-
         login: async (
             _: any,
-            { email, password }: { email: string; password: string }
+            { email, password }: {  email: string; password: string }
         ): Promise<{ token: string; user: IUser }> => {
+            // Busca al usuario en la base de datos
             const user = await User.findOne({ email });
-            if (!user || !(await user.isCorrectPassword(password))) {
-                throw new AuthenticationError('Incorrect credentials');
+            if (!user) {
+              throw new AuthenticationError('No user found with this email address');
             }
-            const token = authenticateToken(user);
-            return { token, user };
-        },
+      
+            // Verifica la contraseña
+            const correctPw = await user.isCorrectPassword(password);
+            if (!correctPw) {
+              throw new AuthenticationError('Incorrect password');
+            }
+      
+            // Genera el token
+            const token = signToken(user.username, user.email, user._id); // Asegúrate de que signToken está definido
+      
+            return { token, user }; // Asegúrate de devolver el token aquí
+          },
+        
+      
 
         saveBook: async (
             _: any,
             { bookInput }: { bookInput: IBook },  // Aquí usas IBook como tipo de entrada
             { user }
         ): Promise<IUser> => {
+            console.log("User in saveBook mutation:", user); 
             if (!user) throw new AuthenticationError('You must be logged in');
             const updatedUser = await User.findByIdAndUpdate(
                 user.id,
                 { $addToSet: { savedBooks: bookInput } },
                 { new: true, runValidators: true }
             ).populate('savedBooks');
-            if (!updatedUser) throw new Error('User not found');
+            if (!updatedUser)  throw new Error('User not found');
+            console.log("Updated user not found for ID:", user.id);
+            console.log("Token after login:", localStorage.getItem('id_token'));
+            
             return updatedUser;
+            
         },
 
         deleteBook: async (

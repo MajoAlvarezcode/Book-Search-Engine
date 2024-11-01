@@ -18,6 +18,10 @@ const SearchBooks = () => {
     // Aquí haces la búsqueda con Google Books API
     // Asegúrate de usar el fetch correspondiente a tu API.
     const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${searchInput}`);
+    if (!response.ok) {
+      console.error('Error fetching data from Google Books API:', response.statusText);
+      return;
+    }
     const { items } = await response.json();
 
     const bookData = items.map((book: GoogleAPIBook) => ({
@@ -36,16 +40,18 @@ const SearchBooks = () => {
     const bookToSave: Book = searchedBooks.find((book) => book.bookId === bookId)!;
 
     const token = Auth.loggedIn() ? Auth.getToken() : null;
+    console.log("Token:", token);
     if (!token) {
       return false;
     }
 
     try {
       await saveBook({ variables: { bookInput: bookToSave } });
+      console.log("Book saved successfully!");
     } catch (err) {
-      console.error(err);
+      console.error("Error saving the book:", err);
     }
-  };
+  }
 
   return (
     <>

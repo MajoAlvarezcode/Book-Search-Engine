@@ -17,5 +17,8 @@
     "concurrently": "^8.2.0",
     "nodemon": "^3.1.7",
     "wait-on": "^8.0.1"
+  },
+  "dependencies": {
+    "cors": "^2.8.5"
   }
 }
