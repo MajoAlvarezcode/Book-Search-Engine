@@ -51,24 +51,27 @@ const resolvers: IResolvers = {
         
       
 
-        saveBook: async (
+          saveBook: async (
             _: any,
-            { bookInput }: { bookInput: IBook },  // Aquí usas IBook como tipo de entrada
-            { user }
+            { bookInput }: { bookInput: IBook },
+            { user, req }: { user: IUser, req: any }
         ): Promise<IUser> => {
-            console.log("User in saveBook mutation:", user); 
+            // Revisar si el usuario está autenticado
+            console.log("User in saveBook mutation:", user);
             if (!user) throw new AuthenticationError('You must be logged in');
-            const updatedUser = await User.findByIdAndUpdate(
-                user.id,
+        
+            // Actualiza al usuario con el nuevo libro guardado
+            const updatedUser = await User.findByIdAndUpdate(user._id,
                 { $addToSet: { savedBooks: bookInput } },
                 { new: true, runValidators: true }
             ).populate('savedBooks');
-            if (!updatedUser)  throw new Error('User not found');
-            console.log("Updated user not found for ID:", user.id);
-            console.log("Token after login:", localStorage.getItem('id_token'));
+        
+            if (!updatedUser) throw new Error('User not found');
+            
+            // Ejemplo de cómo acceder a los encabezados desde la solicitud
+            console.log("Authorization header:", req.headers.authorization);  // Aquí obtienes el token JWT
             
             return updatedUser;
-            
         },
 
         deleteBook: async (
@@ -78,7 +81,7 @@ const resolvers: IResolvers = {
         ): Promise<IUser> => {
             if (!user) throw new AuthenticationError('You must be logged in');
             const updatedUser = await User.findByIdAndUpdate(
-                user.id,
+                user._id,
                 { $pull: { savedBooks: { bookId } } },
                 { new: true }
             ).populate('savedBooks');

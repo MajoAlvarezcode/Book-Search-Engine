@@ -13,8 +13,8 @@ export const authenticateToken = ({ req }: any) => {
   // Cambia de const a let para permitir la reasignación
   let token = req.body?.token || req.query?.token || req.headers?.authorization;
 
-  if (req.headers?.authorization) {
-    token = token.split(' ').pop().trim();
+  if (token && req.headers.authorization) {
+    token = token.split(' ').pop().trim(); // Extrae solo el token del formato Bearer
   }
 
   // Si no hay token, simplemente retorna req sin lanzar error

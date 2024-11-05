@@ -19,7 +19,7 @@ const httpLink = createHttpLink({
 // Middleware para adjuntar el token JWT a cada solicitud
 const authLink = setContext((_, { headers }) => {
   // Obtiene el token de autenticación del local storage
-  const token = localStorage.getItem('id_token');
+  const token = typeof window !== 'undefined' ? localStorage.getItem('id_token') : null;
   console.log("Auth Token:", token);
   // Devuelve los headers al contexto para que httpLink pueda leerlos
   return {
