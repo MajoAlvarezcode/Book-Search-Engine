@@ -1,6 +1,6 @@
 import { IResolvers } from '@graphql-tools/utils';
 import User, { IUser } from '../models/User.js';  // Importando el modelo User
-import {IBook} from '../models/Book';
+import { IBook } from '../models/Book';
 // import { authenticateToken } from '../services/auth.js';
 import { AuthenticationError } from '../services/auth.js';
 import { signToken } from '../services/auth.js';
@@ -29,48 +29,45 @@ const resolvers: IResolvers = {
         },
         login: async (
             _: any,
-            { email, password }: {  email: string; password: string }
+            { email, password }: { email: string; password: string }
         ): Promise<{ token: string; user: IUser }> => {
             // Busca al usuario en la base de datos
             const user = await User.findOne({ email });
             if (!user) {
-              throw new AuthenticationError('No user found with this email address');
+                throw new AuthenticationError('No user found with this email address');
             }
-      
+
             // Verifica la contraseña
             const correctPw = await user.isCorrectPassword(password);
             if (!correctPw) {
-              throw new AuthenticationError('Incorrect password');
+                throw new AuthenticationError('Incorrect password');
             }
-      
+
             // Genera el token
             const token = signToken(user.username, user.email, user._id); // Asegúrate de que signToken está definido
-      
-            return { token, user }; // Asegúrate de devolver el token aquí
-          },
-        
-      
 
-          saveBook: async (
+            return { token, user }; // Asegúrate de devolver el token aquí
+        },
+
+        saveBook: async (
             _: any,
             { bookInput }: { bookInput: IBook },
-            { user, req }: { user: IUser, req: any }
+            { user}: { user: IUser, req: any }
         ): Promise<IUser> => {
             // Revisar si el usuario está autenticado
             console.log("User in saveBook mutation:", user);
             if (!user) throw new AuthenticationError('You must be logged in');
-        
+
             // Actualiza al usuario con el nuevo libro guardado
             const updatedUser = await User.findByIdAndUpdate(user._id,
                 { $addToSet: { savedBooks: bookInput } },
                 { new: true, runValidators: true }
             ).populate('savedBooks');
-        
+
             if (!updatedUser) throw new Error('User not found');
-            
-            // Ejemplo de cómo acceder a los encabezados desde la solicitud
-            console.log("Authorization header:", req.headers.authorization);  // Aquí obtienes el token JWT
-            
+
+          
+
             return updatedUser;
         },
 
