@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Container, Col, Form, Button, Card, Row } from 'react-bootstrap';
+import { Container, Col, Form, Button, Card, Row, Toast } from 'react-bootstrap';
 import { useMutation } from '@apollo/client';
 import Auth from '../utils/auth';
 import { SAVE_BOOK } from '../utils/mutations';
@@ -9,6 +9,8 @@ import type { GoogleAPIBook } from '../models/GoogleAPIBook';
 const SearchBooks = () => {
   const [searchedBooks, setSearchedBooks] = useState<Book[]>([]);
   const [searchInput, setSearchInput] = useState('');
+  const [alertMessage, setAlertMessage] = useState('');
+  const [showAlert, setShowAlert] = useState(false); 
   
   const [saveBook] = useMutation(SAVE_BOOK);
 
@@ -46,6 +48,15 @@ const { items } = await response.json();
 
     try {
       await saveBook({ variables: { bookInput: bookToSave } });
+
+      setAlertMessage('Book saved!');
+      setShowAlert(true);
+
+      setTimeout(() => {
+        setShowAlert(false);
+      }, 3000);
+
+
     } catch (err) {
       console.error(err);
     }
@@ -84,6 +95,23 @@ const { items } = await response.json();
             ? `Viewing ${searchedBooks.length} results:`
             : 'Search for a book to begin'}
         </h2>
+
+      {/* Aquí se muestra el Toast como un mensaje emergente */}
+      {showAlert && (
+          <Toast
+            onClose={() => setShowAlert(false)}
+            style={{
+              position: 'fixed',
+              top: '20px',
+              right: '20px',
+              zIndex: 1050,
+            }}
+            className="bg-success text-white"
+          >
+            <Toast.Body>{alertMessage}</Toast.Body>
+          </Toast>
+        )}
+
         <Row>
           {searchedBooks.map((book) => {
             return (

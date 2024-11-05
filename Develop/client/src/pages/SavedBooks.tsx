@@ -6,7 +6,8 @@ import Auth from '../utils/auth';
 import type { User } from '../models/User';
 
 const SavedBooks = () => {
-  const { loading, data } = useQuery(GET_ME);
+  const { loading, error, data } = useQuery(GET_ME);
+  console.log("Data from GET_ME:", data);
   const [deleteBook] = useMutation(DELETE_BOOK);
 
   // Verificamos que 'data' y 'data.me' están definidos antes de asignar a userData
@@ -18,7 +19,7 @@ const SavedBooks = () => {
     if (!token) {
       return false;
     }
-
+    console.log("Deleting book with ID:", bookId);
     try {
       await deleteBook({ variables: { bookId } });
     } catch (err) {
@@ -26,9 +27,8 @@ const SavedBooks = () => {
     }
   };
 
-  if (loading) {
-    return <h2>LOADING...</h2>;
-  }
+  if (loading) return <h2>Loading...</h2>;
+  if (error) return <h2>Error: {error.message}</h2>;
 
   return (
     <>

@@ -9,8 +9,16 @@ const resolvers: IResolvers = {
     Query: {
         me: async (_, __, { user }): Promise<IUser | null> => {
             if (!user) throw new AuthenticationError('You must be logged in');
-            const foundUser = await User.findById(user.id).populate('savedBooks');
-            return foundUser;
+            try {
+                const foundUser = await User.findById(user._id).populate('savedBooks');
+                if (!foundUser) {
+                    throw new Error('User not found');
+                }
+                return foundUser;
+            } catch (err) {
+                console.error('Error fetching user:', err);
+                throw new Error('Error fetching user');
+            }
         },
     },
     Mutation: {
@@ -52,11 +60,19 @@ const resolvers: IResolvers = {
         saveBook: async (
             _: any,
             { bookInput }: { bookInput: IBook },
-            { user}: { user: IUser, req: any }
+            { user }: { user: IUser, req: any }
         ): Promise<IUser> => {
             // Revisar si el usuario está autenticado
             console.log("User in saveBook mutation:", user);
             if (!user) throw new AuthenticationError('You must be logged in');
+
+            user.savedBooks = user.savedBooks || []; // Garantiza que sea un array
+
+            // Verificar si el libro ya está guardado
+            const existingBook = user.savedBooks.some((book) => book.bookId === bookInput.bookId);
+            if (existingBook) {
+                throw new Error("Book is already saved.");
+            }
 
             // Actualiza al usuario con el nuevo libro guardado
             const updatedUser = await User.findByIdAndUpdate(user._id,
@@ -66,7 +82,7 @@ const resolvers: IResolvers = {
 
             if (!updatedUser) throw new Error('User not found');
 
-          
+
 
             return updatedUser;
         },
@@ -74,15 +90,19 @@ const resolvers: IResolvers = {
         deleteBook: async (
             _: any,
             { bookId }: { bookId: string },
-            { user }
+            { user }: { user: IUser, req: any }
         ): Promise<IUser> => {
             if (!user) throw new AuthenticationError('You must be logged in');
+
+            // Elimina el libro cuyo 'bookId' coincide con el proporcionado
             const updatedUser = await User.findByIdAndUpdate(
                 user._id,
-                { $pull: { savedBooks: { bookId } } },
+                { $pull: { savedBooks: { bookId } } },  // Aquí usamos bookId en lugar de bookInput
                 { new: true }
             ).populate('savedBooks');
+
             if (!updatedUser) throw new Error('User not found');
+
             return updatedUser;
         },
     },

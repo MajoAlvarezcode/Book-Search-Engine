@@ -27,7 +27,9 @@ const startApolloServer = async () => {
 
   app.use('/graphql', expressMiddleware(server, {
     context: ({ req }) => {
-      return authenticateToken({ req });  // Asegúrate de que `req` está definido aquí
+      return authenticateToken({ req }); 
+      
+       // Asegúrate de que `req` está definido aquí
     },
   }));
 
