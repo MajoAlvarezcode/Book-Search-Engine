@@ -6,11 +6,11 @@ import type { Request, Response } from 'express';
 import { typeDefs, resolvers } from './schemas/index.js';
 import db from './config/connection.js';
 import { authenticateToken } from './services/auth.js';
-import { fileURLToPath } from 'url';
+// import { fileURLToPath } from 'url';
 
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = path.dirname(__filename);
 
 const server = new ApolloServer({
   typeDefs,
