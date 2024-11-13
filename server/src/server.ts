@@ -6,11 +6,7 @@ import type { Request, Response } from 'express';
 import { typeDefs, resolvers } from './schemas/index.js';
 import db from './config/connection.js';
 import { authenticateToken } from './services/auth.js';
-// import { fileURLToPath } from 'url';
 
-
-// const __filename = fileURLToPath(import.meta.url);
-// const __dirname = path.dirname(__filename);
 
 const server = new ApolloServer({
   typeDefs,
@@ -43,12 +39,6 @@ const startApolloServer = async () => {
       res.sendFile(path.join(__dirname, '../client/dist/index.html'));
     });
 
-    // const distDir = path.resolve('client', 'dist');
-    // app.use(express.static(distDir));
-  
-    // app.get('*', (_req: Request, res: Response) => {
-    //   res.sendFile(path.join(distDir, 'index.html'));
-    // });
   }
 
   app.listen(PORT, () => {
