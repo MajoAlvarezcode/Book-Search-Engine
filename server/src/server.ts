@@ -38,12 +38,17 @@ const startApolloServer = async () => {
   }));
 
   if (process.env.NODE_ENV === 'production') {
-    const distDir = path.resolve('client', 'dist');
-    app.use(express.static(distDir));
-  
+    app.use(express.static(path.join(__dirname, '../client/dist')));
     app.get('*', (_req: Request, res: Response) => {
-      res.sendFile(path.join(distDir, 'index.html'));
+      res.sendFile(path.join(__dirname, '../client/dist/index.html'));
     });
+
+    // const distDir = path.resolve('client', 'dist');
+    // app.use(express.static(distDir));
+  
+    // app.get('*', (_req: Request, res: Response) => {
+    //   res.sendFile(path.join(distDir, 'index.html'));
+    // });
   }
 
   app.listen(PORT, () => {
