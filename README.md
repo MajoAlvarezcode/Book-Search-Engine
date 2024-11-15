@@ -1,7 +1,7 @@
 
 # Book-Search-Engine
 
-## Deployed app
+## Link to deployed app
 https://book-search-engine-1-4uoi.onrender.com
 
 ## Table of Contents
