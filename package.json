@@ -18,11 +18,17 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/dotenv": "^8.2.3",
+    "@types/jsonwebtoken": "^9.0.7",
     "concurrently": "^8.2.0",
     "nodemon": "^3.1.7",
     "wait-on": "^8.0.1"
   },
   "dependencies": {
-    "cors": "^2.8.5"
+    "bcrypt": "^5.1.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "jsonwebtoken": "^9.0.2"
   }
 }
